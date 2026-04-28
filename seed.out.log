@@ -1,0 +1,4 @@
+
+> lista-estudiante@0.1.0 seed:schools
+> node scripts/seed-school-data.mjs
+

@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /schools/{schoolId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn()
+        && request.resource.data.name is string;
+    }
+
+    match /courses/{courseId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn()
+        && request.resource.data.name is string
+        && request.resource.data.schoolId is string;
+    }
+
+    match /students/{studentId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn()
+        && request.resource.data.fullName is string
+        && request.resource.data.courseId is string;
+    }
+
+    match /attendance/{attendanceId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn()
+        && request.resource.data.date.matches('^\\d{4}-\\d{2}-\\d{2}$');
+    }
+  }
+}
