@@ -60,6 +60,12 @@ npm run seed:schools
 
 El seed hace `upsert` por nombre de escuela, combinacion `schoolId + course.name` y `courseId + student.fullName`, para evitar duplicados si lo corres mas de una vez.
 
+Tambien soporta alumnos inactivos en `scripts/data/schools.seed.mjs` usando objetos como:
+
+```js
+{ fullName: "Perez, Ana", isActive: false }
+```
+
 Nota:
 El frontend no implementa autenticacion todavia. Si tu proyecto Firestore no esta en modo prueba, vas a necesitar habilitar Auth o ajustar tus reglas antes de usar la app contra produccion.
 

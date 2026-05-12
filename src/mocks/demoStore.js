@@ -17,6 +17,20 @@ function safeId(prefix, value) {
   return `${prefix}-${normalizeText(value)}`;
 }
 
+function normalizeStudentSeed(studentSeed) {
+  if (typeof studentSeed === "string") {
+    return {
+      fullName: studentSeed,
+      isActive: true,
+    };
+  }
+
+  return {
+    fullName: studentSeed.fullName,
+    isActive: studentSeed.isActive !== false,
+  };
+}
+
 const baseSchools = schoolSeeds.map((schoolSeed) => ({
   id: safeId("school", schoolSeed.name),
   name: schoolSeed.name,
@@ -38,13 +52,17 @@ const studentsByCourse = Object.fromEntries(
       const courseId = safeId("course", `${schoolSeed.name}-${courseSeed.name}`);
       return [
         courseId,
-        courseSeed.students.map((studentName, index) => ({
-          id: safeId("student", `${courseId}-${studentName}-${index + 1}`),
-          fullName: studentName,
-          courseId,
-          isActive: true,
-          createdAt: "2026-04-01T08:00:00.000Z",
-        })),
+        courseSeed.students.map((studentSeed, index) => {
+          const student = normalizeStudentSeed(studentSeed);
+
+          return {
+            id: safeId("student", `${courseId}-${student.fullName}-${index + 1}`),
+            fullName: student.fullName,
+            courseId,
+            isActive: student.isActive,
+            createdAt: "2026-04-01T08:00:00.000Z",
+          };
+        }),
       ];
     }),
   ),

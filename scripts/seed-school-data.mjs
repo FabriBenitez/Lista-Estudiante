@@ -120,6 +120,20 @@ function studentFallbackId(courseId, studentName, index) {
   return safeId("student", `${courseId}-${studentName}${suffix}`);
 }
 
+function normalizeStudentSeed(studentSeed) {
+  if (typeof studentSeed === "string") {
+    return {
+      fullName: studentSeed,
+      isActive: true,
+    };
+  }
+
+  return {
+    fullName: studentSeed.fullName,
+    isActive: studentSeed.isActive !== false,
+  };
+}
+
 function chunk(array, size) {
   const chunks = [];
   for (let index = 0; index < array.length; index += size) {
@@ -213,8 +227,9 @@ try {
       const reuseCounters = new Map();
       const generatedCounters = new Map();
 
-      courseSeed.students.forEach((studentName) => {
-        const studentKey = normalizeText(studentName);
+      courseSeed.students.forEach((studentSeed) => {
+        const student = normalizeStudentSeed(studentSeed);
+        const studentKey = normalizeText(student.fullName);
         const pool = existingPools.get(studentKey) || [];
         const nextReuseIndex = reuseCounters.get(studentKey) || 0;
         const matchedStudent = pool[nextReuseIndex];
@@ -225,14 +240,14 @@ try {
 
         const studentId =
           matchedStudent?.id ||
-          studentFallbackId(courseId, studentName, nextGeneratedIndex);
+          studentFallbackId(courseId, student.fullName, nextGeneratedIndex);
 
         operations.push({
           ref: doc(db, "students", studentId),
           data: {
-            fullName: studentName,
+            fullName: student.fullName,
             courseId,
-            isActive: true,
+            isActive: student.isActive,
             createdAt: pickCreatedAt(matchedStudent?.data),
           },
         });
